@@ -7,7 +7,7 @@
             android:key="FTPServer" />
         <EditTextPreference
             android:summary="Enter a default directory"
-            android:defaultValue="sites/default/files/private/users/mweltech/"
+            android:defaultValue="/sites/default/files/private/users/mweltech/"
             android:title="Remote Directory"
             android:key="FTPDirectory" />
         <EditTextPreference
