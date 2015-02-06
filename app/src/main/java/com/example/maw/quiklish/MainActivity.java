@@ -1,14 +1,14 @@
 package com.example.maw.quiklish;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-
-import org.xmlpull.v1.XmlPullParserException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,6 +37,17 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
     @Override
      protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, new SettingsFragment())
+                .commit();
+
+
+        //get data from settings activity in this case the language
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        String s = settings.getString("FTPServer","0.0.0.0");
+
 
         // Check whether we're recreating a previously destroyed instance
         if (savedInstanceState != null) {
@@ -75,6 +86,14 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
     protected void onStart() {
         super.onStart();
 
+
+        //SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+
+        //String sFTPServer=settings.getString("FTPServer", "127.0.0.1");
+        //String sFilePath=sharedPrefs.getString("FTPDirectory","/");
+
+
         if(current_state==DOWNLOAD_NOW) {
             FTPDownload ftp = new FTPDownload();
             TextView t = new TextView(this);
@@ -83,7 +102,10 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
             File extPath = new File(SD_PATH);
             ftp.setPath(extPath);
             ftp.setDownloadListener(this);
-            ftp.execute(new String[]{"166.62.2.1", "sites/default/files/private/users/mweltech/"});
+
+
+
+            //ftp.execute(new String[]{sFTPServer, sFilePath});
         }
 
         //movie_activity = new Intent(this, Movies.class);
@@ -187,6 +209,18 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
                 current_displayed_item++;
                 startActivityForResult(eventlist_activity,0);
             }
+        }
+    }
+
+
+    public static class PrefsFragment extends PreferenceFragment {
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            // Load the preferences from an XML resource
+            addPreferencesFromResource(R.xml.preferences);
         }
     }
 
