@@ -44,9 +44,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
                 .commit();
 
 
-        //get data from settings activity in this case the language
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        String s = settings.getString("FTPServer","0.0.0.0");
+
 
 
         // Check whether we're recreating a previously destroyed instance
@@ -86,13 +84,10 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
     protected void onStart() {
         super.onStart();
 
-
-        //SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-
-        //String sFTPServer=settings.getString("FTPServer", "127.0.0.1");
-        //String sFilePath=sharedPrefs.getString("FTPDirectory","/");
-
+        //get data from settings activity in this case the language
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        String prefFTPServer = settings.getString("FTPServer","0.0.0.0");
+        String prefFTPDirectory = settings.getString("FTPDirectory","/");
 
         if(current_state==DOWNLOAD_NOW) {
             FTPDownload ftp = new FTPDownload();
@@ -105,13 +100,13 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
 
 
 
-            //ftp.execute(new String[]{sFTPServer, sFilePath});
+            ftp.execute(new String[]{prefFTPServer, prefFTPDirectory});
         }
 
-        //movie_activity = new Intent(this, Movies.class);
-        //startActivityForResult(movie_activity,0);
-       // movie_activity = new Intent(this, Gallery.class);
-       // startActivityForResult(gallery_activity,0);
+        movie_activity = new Intent(this, Movies.class);
+        startActivityForResult(movie_activity,0);
+        movie_activity = new Intent(this, Gallery.class);
+        startActivityForResult(gallery_activity,0);
     }
 
     @Override
