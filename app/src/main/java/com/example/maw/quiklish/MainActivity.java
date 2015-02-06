@@ -1,7 +1,9 @@
 package com.example.maw.quiklish;
 
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -22,7 +24,8 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
 
     static final String CURRENT_STATE = "CurrentState";
     static final String CURRENT_DISPLAYED_ITEM = "CurrentDisplayedItem";
-    static final String SD_PATH = "/storage/emulated/0/Pictures/EzyDisplay";
+    //static final String SD_PATH = "/storage/emulated/0/Pictures/EzyDisplay";
+
 
     static final Integer DOWNLOAD_NOW = 1;
     static final Integer DOWNLOADS_DONE = 2;
@@ -94,13 +97,13 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
             TextView t = new TextView(this);
             t = (TextView) findViewById(R.id.status1);
             ftp.setStatusDisplay(t);
-            File extPath = new File(SD_PATH);
+            File extPath = getDir("Quicklish", MODE_PRIVATE);
             ftp.setPath(extPath);
             ftp.setDownloadListener(this);
 
 
 
-            ftp.execute(new String[]{prefFTPServer, prefFTPDirectory});
+            ftp.execute(new String[]{prefFTPServer, "/"+prefFTPDirectory});
         }
 
         movie_activity = new Intent(this, Movies.class);
@@ -159,7 +162,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
 
     private void readDisplayItems() {
         try {
-            FileInputStream config_file = new FileInputStream("/storage/emulated/0/Pictures/EzyDisplay/ezydisplaydata.xml");
+            FileInputStream config_file = new FileInputStream(getDir("Quicklish", MODE_PRIVATE)+"/ezydisplaydata.xml");
             DisplayListReader display_list_reader = new DisplayListReader();
             display_list_reader.readListFromFile(config_file);
             displayitems = display_list_reader.getList();
@@ -184,7 +187,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
                 gallery_activity.removeExtra("DISPLAY_IMAGE_FILE");
                 gallery_activity.putExtra("DISPLAY_IMAGE_FILE",displayitems.get(current_displayed_item).file);
                 gallery_activity.removeExtra("DISPLAY_IMAGE_FILE_PATH");
-                gallery_activity.putExtra("DISPLAY_IMAGE_FILE_PATH",SD_PATH);
+                gallery_activity.putExtra("DISPLAY_IMAGE_FILE_PATH",getDir("Quicklish", MODE_PRIVATE));
                 current_displayed_item++;
                 startActivityForResult(gallery_activity,0);
             }
@@ -192,7 +195,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
                 movie_activity.removeExtra("DISPLAY_MOVIE_FILE");
                 movie_activity.putExtra("DISPLAY_MOVIE_FILE",displayitems.get(current_displayed_item).file);
                 movie_activity.removeExtra("DISPLAY_MOVIE_FILE_PATH");
-                movie_activity.putExtra("DISPLAY_MOVIE_FILE_PATH",SD_PATH);
+                movie_activity.putExtra("DISPLAY_MOVIE_FILE_PATH",getDir("Quicklish", MODE_PRIVATE));
                 current_displayed_item++;
                 startActivityForResult(movie_activity,0);
             }
@@ -200,7 +203,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
                 eventlist_activity.removeExtra("DISPLAY_EVENTLIST_FILE");
                 eventlist_activity.putExtra("DISPLAY_EVENTLIST_FILE",displayitems.get(current_displayed_item).file);
                 eventlist_activity.removeExtra("DISPLAY_EVENTLIST_FILE_PATH");
-                eventlist_activity.putExtra("DISPLAY_EVENTLIST_FILE_PATH",SD_PATH);
+                eventlist_activity.putExtra("DISPLAY_EVENTLIST_FILE_PATH",getDir("Quicklish", MODE_PRIVATE));
                 current_displayed_item++;
                 startActivityForResult(eventlist_activity,0);
             }
