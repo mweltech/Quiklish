@@ -35,6 +35,9 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
         String host       = url[0];
         String remoteDir  = url[1];
         //String remoteFile = url[2];
+
+        Integer gittest = 0; gittest++;
+
         Integer i=0;
         getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,"ezydisplaydata.xml");   publishProgress(++i);
         List<DisplayItem> displayitems;
