@@ -17,7 +17,7 @@ import android.widget.*;
 
 public class FTPDownload extends AsyncTask<String, Integer, String>{
     DownloadListener alldone_listener;
-    File private_path;
+//    File private_path;
     TextView status_update;
 
      @Override
@@ -29,19 +29,17 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
     //@Override
     protected String doInBackground(String... url) {
 
-        android.os.Debug.waitForDebugger();
+        //android.os.Debug.waitForDebugger();
 
         String response="";
         String host       = url[0];
         String remoteDir  = url[1];
-        //String remoteFile = url[2];
-
-        Integer gittest = 0; gittest++;
+        String localDir   = url[2];
 
         Integer i=0;
-        getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,"ezydisplaydata.xml");   publishProgress(++i);
+        getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,"ezydisplaydata.xml",localDir);   publishProgress(++i);
         List<DisplayItem> displayitems;
-        File xmlFile = new File(private_path,"ezydisplaydata.xml");
+        File xmlFile = new File(localDir,"ezydisplaydata.xml");
         try {
             FileInputStream config_file = new FileInputStream(xmlFile.getAbsolutePath());
             DisplayListReader display_list_reader = new DisplayListReader();
@@ -49,7 +47,7 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
             displayitems = display_list_reader.getList();
             config_file.close();
             for(DisplayItem displayitem : displayitems) {
-                getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,displayitem.file);
+                getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,displayitem.file,localDir);
                 publishProgress(++i);
             }
         }
@@ -69,7 +67,7 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
         return response;
     }
 
-    void getFile(String host, int port, String user, String pass, String remoteDir,String remoteFile) {
+    void getFile(String host, int port, String user, String pass, String remoteDir,String remoteFile,String localDir) {
         FTPClient client = new FTPClient();
         try {
             String serverHostMessage[] = client.connect( host, port);
@@ -78,12 +76,13 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
             client.changeDirectory(remoteDir);
             client.setType(FTPClient.TYPE_BINARY);
             client.setPassive(true);
-
-            File localFile = File.createTempFile("ezyd", ".tmp", private_path); //directoryEzyDisplay);
-            client.download(remoteFile, localFile );
+            File localDirectory = new File(localDir);
+            localDirectory.mkdirs();
+            File localFile = File.createTempFile("ezyd", ".tmp", localDirectory); //directoryEzyDisplay);
+            client.download(remoteFile, localFile);
             client.disconnect(true);
 
-            File successFile = new File(private_path.getPath(),remoteFile);
+            File successFile = new File(localDirectory,remoteFile);
             successFile.delete();
             localFile.renameTo(successFile);
         } catch (IllegalStateException e) {
@@ -125,15 +124,15 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
 
 
 
-    public void setPath(File filesDir) {
-        // TODO Auto-generated method stub
-        private_path=filesDir;
-        if (!private_path.mkdirs()) {
-            //error
-
-        }
-
-    }
+//    public void setPath(File filesDir) {
+//        // TODO Auto-generated method stub
+//        private_path=filesDir;
+//        if (!private_path.mkdirs()) {
+//            //error
+//
+//        }
+//
+//    }
 
     public void setStatusDisplay(TextView status) {
         status_update=status;

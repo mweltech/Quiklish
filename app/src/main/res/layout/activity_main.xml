@@ -1,12 +1,58 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/background_dark"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
+    <TextView android:text="Welcome to Quiklish" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/welcomeToQuiklish"
+        android:textColor="#fe9900"
+        android:textSize="24sp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" />
+
+    <TextView android:text="Type in the channel name and hit Go!" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/channelPrompt"
+        android:textColor="#c0c0c0"
+        android:textSize="20sp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/channel"
+        android:autoText="false"
+        android:padding="10dp"
+        android:background="@drawable/rounded_edittext"
+        android:textColor="#fe9900"
+        android:textSize="18sp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:textStyle="bold|italic"
+        android:gravity="center" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Go!"
+        android:id="@+id/goBabyGo"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="#fe9900" />
+
+    <TextView android:text="" android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/status1" />
 
-</RelativeLayout>
+</LinearLayout>
