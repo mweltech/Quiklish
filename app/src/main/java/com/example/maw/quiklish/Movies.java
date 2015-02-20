@@ -14,7 +14,6 @@ import java.io.File;
  */
 public class Movies extends Activity {
     VideoView myVideoView;
-    String movie_file = "/sdcard/Movies/small.mp4";
     String displayFilePath;
     String displayFile;
 
@@ -48,8 +47,8 @@ public class Movies extends Activity {
         setContentView(R.layout.movies);
         File movieFile = new File(displayFilePath,displayFile);
         myVideoView = (VideoView)findViewById(R.id.videoView1);
-        myVideoView.setVideoPath(movieFile.getAbsolutePath());
-        //myVideoView.setVideoPath(movie_file);
+        String sPathToMovie = movieFile.getAbsolutePath();
+        myVideoView.setVideoPath(sPathToMovie);
         //myVideoView.setMediaController(new MediaController(this));
         myVideoView.requestFocus();
         myVideoView.start();
