@@ -117,7 +117,7 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
 
     @Override
     protected void onProgressUpdate(Integer... progress) {
-        status_update.append("Downloaded "+progress[0].toString()+" files");
+        status_update.append("Downloaded "+progress[0].toString()+" files\n");
 
     }
 
