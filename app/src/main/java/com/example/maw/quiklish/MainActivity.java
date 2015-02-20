@@ -26,12 +26,15 @@ import java.util.List;
 
 //package com.example.maw.quiklish;
 
+// Changes:
+
+//
+
+
 public class MainActivity extends ActionBarActivity implements DownloadListener {
 
     static final String CURRENT_STATE = "CurrentState";
     static final String CURRENT_DISPLAYED_ITEM = "CurrentDisplayedItem";
-    //static final String SD_PATH = "/storage/emulated/0/Pictures/EzyDisplay";
-
 
     static final int GET_SETTINGS   = 1;
     static final int DOWNLOAD_NOW   = 2;
@@ -66,7 +69,9 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
         movie_activity = new Intent(this, Movies.class);
         gallery_activity = new Intent(this, Gallery.class);
         eventlist_activity = new Intent(this, EventList.class);
-        final Button button = (Button) findViewById(R.id.goBabyGo);
+
+        final Button button;
+        button = (Button) findViewById(R.id.goBabyGo);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 EditText e = new EditText(MainActivity.this);
@@ -98,7 +103,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
             case GET_SETTINGS:
                 //getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
                 current_state=DOWNLOAD_NOW;
-                // dont break -- fall through to DownloadFiles();
+                // don't break -- fall through to DownloadFiles();
             case DOWNLOAD_NOW:
                 //DownloadFiles();
                 break;
