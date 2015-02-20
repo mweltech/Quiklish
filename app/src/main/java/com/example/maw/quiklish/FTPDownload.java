@@ -13,7 +13,11 @@ import java.io.*;
 import java.util.List;
 
 import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.widget.*;
+
+
+
 
 public class FTPDownload extends AsyncTask<String, Integer, String>{
     DownloadListener alldone_listener;
@@ -78,6 +82,7 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
             client.setPassive(true);
             File localDirectory = new File(localDir);
             localDirectory.mkdirs();
+            localDirectory.setReadable(true, false);
             File localFile = File.createTempFile("ezyd", ".tmp", localDirectory); //directoryEzyDisplay);
             client.download(remoteFile, localFile);
             client.disconnect(true);
@@ -85,6 +90,8 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
             File successFile = new File(localDirectory,remoteFile);
             successFile.delete();
             localFile.renameTo(successFile);
+            boolean bResult = successFile.setReadable(true,false);
+            boolean bResult2 = successFile.setWritable(true,false);
         } catch (IllegalStateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -110,7 +117,8 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
 
     @Override
     protected void onProgressUpdate(Integer... progress) {
-        status_update.setText("Downloaded "+progress[0].toString()+" files");
+        status_update.append("Downloaded "+progress[0].toString()+" files");
+
     }
 
     @Override
