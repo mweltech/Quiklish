@@ -33,7 +33,7 @@
         android:autoText="false"
         android:padding="10dp"
         android:background="@drawable/rounded_edittext"
-        android:textColor="#fe9900"
+        android:textColor="#ff6b0307"
         android:textSize="18sp"
         android:layout_gravity="center_vertical|center_horizontal"
         android:layout_marginTop="10dp"
@@ -44,15 +44,18 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Go!"
+        android:text="@string/buttonStart"
         android:id="@+id/goBabyGo"
         android:layout_gravity="center_vertical|center_horizontal"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:background="#fe9900" />
+        android:background="@drawable/gobutton"
+        android:clickable="true" />
 
     <TextView android:text="" android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/status1" />
+        android:id="@+id/status1"
+        android:layout_gravity="bottom"
+        android:gravity="bottom" />
 
 </LinearLayout>
