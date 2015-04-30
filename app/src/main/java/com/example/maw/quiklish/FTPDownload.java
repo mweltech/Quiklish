@@ -16,12 +16,8 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.widget.*;
 
-
-
-
 public class FTPDownload extends AsyncTask<String, Integer, String>{
     DownloadListener alldone_listener;
-//    File private_path;
     TextView status_update;
 
      @Override
@@ -62,21 +58,16 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        //getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,"EzyDisplay.jpeg");      publishProgress(++i);
-        //getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,"Handsome.jpeg");        publishProgress(++i);
-        //getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,"Restaurant.jpeg");      publishProgress(++i);
-        //getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,"EZYDISPLAY.m4v");       publishProgress(++i);
-        //getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,"eventlist1.xml");       publishProgress(++i);
         response="Done";
         return response;
     }
 
-    void getFile(String host, int port, String user, String pass, String remoteDir,String remoteFile,String localDir) {
+    boolean getFile(String host, int port, String user, String pass, String remoteDir,String remoteFile,String localDir) {
+        boolean success=false;
         FTPClient client = new FTPClient();
         try {
             String serverHostMessage[] = client.connect( host, port);
             client.login(user, pass);
-
             client.changeDirectory(remoteDir);
             client.setType(FTPClient.TYPE_BINARY);
             client.setPassive(true);
@@ -90,8 +81,8 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
             File successFile = new File(localDirectory,remoteFile);
             successFile.delete();
             localFile.renameTo(successFile);
-            boolean bResult = successFile.setReadable(true,false);
-            boolean bResult2 = successFile.setWritable(true,false);
+            successFile.setReadable(true,false);
+            success = successFile.setWritable(true,false);
         } catch (IllegalStateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -113,6 +104,7 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return success;
     }
 
     @Override
@@ -124,23 +116,10 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
     @Override
     protected void onPostExecute(String result) {
         // TODO Auto-generated method stub
-        //status_update.setText(result); //"Finished");
         // Update your UI here
         alldone_listener.isFinished();
         return;
     }
-
-
-
-//    public void setPath(File filesDir) {
-//        // TODO Auto-generated method stub
-//        private_path=filesDir;
-//        if (!private_path.mkdirs()) {
-//            //error
-//
-//        }
-//
-//    }
 
     public void setStatusDisplay(TextView status) {
         status_update=status;

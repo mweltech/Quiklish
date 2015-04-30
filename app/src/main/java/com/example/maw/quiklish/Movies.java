@@ -20,42 +20,27 @@ public class Movies extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
         setContentView(R.layout.movies);
-        //VideoView myVideoView = (VideoView)findViewById(R.id.videoView1);
-        //myVideoView.setVideoPath("/storage/emulated/0/Pictures/EzyDisplay/EZYDISPLAY.m4v");
-        //myVideoView.setVideoPath(movie_file);
-        //myVideoView.setMediaController(new MediaController(this));
-        //myVideoView.requestFocus();
-        //myVideoView.start();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             displayFile = extras.getString("DISPLAY_MOVIE_FILE");
             displayFilePath = extras.getString("DISPLAY_MOVIE_FILE_PATH");
         }
-        else {
-            //displayFile = "EzyDisplay.jpeg";
-            //displayFilePath = getFilesDir().getPath();
-        }
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        //setContentView(R.layout.activity_main);
         setContentView(R.layout.movies);
         File movieFile = new File(displayFilePath,displayFile);
         myVideoView = (VideoView)findViewById(R.id.videoView1);
         String sPathToMovie = movieFile.getAbsolutePath();
         myVideoView.setVideoPath(sPathToMovie);
-        //myVideoView.setMediaController(new MediaController(this));
         myVideoView.requestFocus();
         myVideoView.start();
 
         myVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
-                //myVideoView.start();
                 finish();
             }
         });

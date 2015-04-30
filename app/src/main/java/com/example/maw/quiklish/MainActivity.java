@@ -1,19 +1,25 @@
 package com.example.maw.quiklish;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,8 +39,14 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements DownloadListener {
 
+    SharedPreferences settings;
+    SharedPreferences.OnSharedPreferenceChangeListener listener;
+
     static final String CURRENT_STATE = "CurrentState";
     static final String CURRENT_DISPLAYED_ITEM = "CurrentDisplayedItem";
+
+    static final int GO_PREVIOUS    = 1;
+    static final int GO_NEXT        = 2;
 
     static final int GET_SETTINGS   = 1;
     static final int DOWNLOAD_NOW   = 2;
@@ -46,6 +58,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
     private int current_state;
     private List<DisplayItem> displayitems;
     private Integer current_displayed_item;
+    private boolean cancel_startup_timer = false;
 
     @Override
      protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +67,19 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
         // remove title
 
         setContentView(R.layout.activity_main);
+
+        settings = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                //Log.d("LISTENING! - Pref changed for: ", key );
+                if(key.equals("StartupOnBoot")) {
+                    setStartOnBoot(prefs.getBoolean(key,false));
+                }
+            }
+        };
+
+        settings.registerOnSharedPreferenceChangeListener(listener);
+
 
         // Check whether we're recreating a previously destroyed instance
         if (savedInstanceState != null) {
@@ -70,19 +96,65 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
         gallery_activity = new Intent(this, Gallery.class);
         eventlist_activity = new Intent(this, EventList.class);
 
-        final Button button;
-        button = (Button) findViewById(R.id.goBabyGo);
-        button.setOnClickListener(new View.OnClickListener() {
+        //select last/default channel
+        String prefChannel = getPreferencesString("Channel");
+        if(prefChannel.length()>0) {
+            EditText e = new EditText(MainActivity.this);
+            e = (EditText) findViewById(R.id.channel);
+            e.setText(prefChannel);
+        }
+
+        final Button go_button = (Button) findViewById(R.id.goBabyGo);
+        go_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                EditText e = new EditText(MainActivity.this);
-                e = (EditText)findViewById(R.id.channel);
-                InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(Activity.INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                // Perform action on click
-                DownloadFiles(e.getText().toString());
+                tuneInChannel();
             }
         });
 
+        final TextView channel_selection = (TextView) findViewById(R.id.channel);
+        channel_selection.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView exampleView, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE ||
+                    actionId == EditorInfo.IME_ACTION_GO ||
+                    (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_DOWN)) {
+
+                        tuneInChannel();
+
+                }
+                return true;
+            }
+        });
+
+        new CountDownTimer(5000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                if(cancel_startup_timer==true) {
+                    cancel();
+                }
+            }
+
+            public void onFinish() {
+                tuneInChannel();
+            }
+        }.start();
+    }
+
+    public void tuneInChannel() {
+        current_displayed_item = 0;
+        cancel_startup_timer = true;
+        EditText e = new EditText(MainActivity.this);
+        e = (EditText)findViewById(R.id.channel);
+        // hide the keyboard
+        InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        // check channel is not blank and get the data
+        if(e.getText().toString().length()>0) {
+           saveChannelAsDefault(e.getText().toString());
+           DownloadFiles(e.getText().toString());
+        }
+    }
+
+    public void saveChannelAsDefault(String channel) {
+        setPreferencesString("Channel",channel);
     }
 
     @Override
@@ -91,8 +163,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
         t=(TextView)findViewById(R.id.status1);
         t.setText("Downloads all done.");
         current_state=DOWNLOADS_DONE;
-        runTheShow();
-
+        runTheShow(GO_NEXT);
     }
 
     @Override
@@ -111,38 +182,28 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
     }
 
     private void DownloadFiles(String channel) {
-
         FTPDownload ftp = new FTPDownload();
         TextView t = new TextView(this);
         t = (TextView) findViewById(R.id.status1);
         ftp.setStatusDisplay(t);
-        //File extPath = getDir("Quiklish", MODE_PRIVATE);
-        //ftp.setPath(extPath);
         ftp.setDownloadListener(this);
-
-        //ftp.execute(new String[]{prefFTPServer, "/"+prefFTPDirectory});
-        //ftp.execute(new String[]{"166.62.2.1","/sites/default/files/private/users/mweltech"});
-//        if(prefRemoteDirectory.charAt(prefRemoteDirectory.length()-1)!='/') {
-//            prefRemoteDirectory += "/";
-//        }
-//        if(prefRemoteDirectory.charAt(prefLocalDirectory.length()-1)!='/') {
-//            prefRemoteDirectory += "/";
-//        }
-
         String prefServer = getPreferencesString("Server");
-        String prefRemoteDirectory = getPreferencesString("RemoteDirectory");
-        //String prefChannel = getPreferencesString("Channel");
-        String prefLocalDirectory = getPreferencesString("LocalDirectory");
-        prefRemoteDirectory=fixDirectoryPath(prefRemoteDirectory);
-        prefLocalDirectory=fixDirectoryPath(prefLocalDirectory);
-        //ftp.execute(new String[]{prefServer,prefRemoteDirectory+prefChannel,prefLocalDirectory});
-        ftp.execute(new String[]{prefServer,prefRemoteDirectory+channel,prefLocalDirectory});
+        String prefRemoteDirectory = getRemoteDirectory();
+        String prefLocalDirectory = getLocalDirectory();
+        ftp.execute(new String[]{prefServer,prefRemoteDirectory,prefLocalDirectory});
     }
 
     private String getPreferencesString(String prefName) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        //SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         String prefString = settings.getString(prefName,"");
         return prefString;
+    }
+
+    private void setPreferencesString(String prefName, String value) {
+        //SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(prefName, value);
+        editor.commit();
     }
 
     private String fixDirectoryPath(String directoryPath) {
@@ -152,16 +213,38 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
         return directoryPath;
     }
 
+    public void setStartOnBoot(boolean startOnBoot) {
+        ComponentName receiver = new ComponentName(MainActivity.this, StartMyAppAtBootReceiver.class);
+        PackageManager pm = getPackageManager();
+        if(startOnBoot==true) {
+            pm.setComponentEnabledSetting(receiver,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP);
+        } else {
+            pm.setComponentEnabledSetting(receiver,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
         if (requestCode == 0) {
             // Make sure the request was successful
-            //if (resultCode == RESULT_OK) {
-
-                finishActivity(0);
-                runTheShow();
-            //}
+            if (resultCode == RESULT_OK) {
+                String reason = data.getStringExtra("FINISH_REASON");
+                // only move to next item if the timer finishes normally...
+                if(reason.equals("TIMER_DONE") || reason.equals("USER_FLING_LEFT") || reason.equals("USER_FLING_RIGHT")) {
+                    finishActivity(0);
+                    if(reason.equals("USER_FLING_LEFT")) {
+                        runTheShow(GO_PREVIOUS);
+                    }
+                    else {
+                        runTheShow(GO_NEXT);
+                    }
+                }
+            }
         }
     }
 
@@ -198,11 +281,23 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
         return super.onOptionsItemSelected(item);
     }
 
+    private String getLocalDirectory() {
+        String prefDirectory = getPreferencesString("LocalDirectory");
+        prefDirectory=fixDirectoryPath(prefDirectory);
+        prefDirectory=fixDirectoryPath(prefDirectory+getPreferencesString("Channel"));
+        return prefDirectory;
+    }
+
+    private String getRemoteDirectory() {
+        String prefDirectory = getPreferencesString("RemoteDirectory");
+        prefDirectory=fixDirectoryPath(prefDirectory);
+        prefDirectory=fixDirectoryPath(prefDirectory+getPreferencesString("Channel"));
+        return prefDirectory;
+    }
+
     private void readDisplayItems() {
         try {
-            String prefLocalDirectory = getPreferencesString("LocalDirectory");
-            prefLocalDirectory=fixDirectoryPath(prefLocalDirectory);
-            //FileInputStream config_file = new FileInputStream(getDir("Quicklish", MODE_PRIVATE)+"/ezydisplaydata.xml");
+            String prefLocalDirectory = getLocalDirectory();
             FileInputStream config_file = new FileInputStream(prefLocalDirectory+"ezydisplaydata.xml");
             DisplayListReader display_list_reader = new DisplayListReader();
             display_list_reader.readListFromFile(config_file);
@@ -218,19 +313,26 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
         }
     }
 
-    private void runTheShow() {
-        String prefLocalDirectory = getPreferencesString("LocalDirectory");
-        prefLocalDirectory=fixDirectoryPath(prefLocalDirectory);
+    private void runTheShow(int direction) {
+        String prefLocalDirectory = getLocalDirectory();
         readDisplayItems();
         if(displayitems!=null) {
-            if(current_displayed_item>displayitems.size()-1) {
-                current_displayed_item = 0;
+            if(direction==GO_NEXT) {
+                if (current_displayed_item > displayitems.size() - 1) {
+                    current_displayed_item = 0;
+                }
+            }
+            else {
+                current_displayed_item--; // we are currently pointing to next so dec by 2
+                current_displayed_item--;
+                if (current_displayed_item < 0) {
+                    current_displayed_item = displayitems.size() - 1;
+                }
             }
             if(displayitems.get(current_displayed_item).item_type.equals("picture")) {
                 gallery_activity.removeExtra("DISPLAY_IMAGE_FILE");
                 gallery_activity.putExtra("DISPLAY_IMAGE_FILE",displayitems.get(current_displayed_item).file);
                 gallery_activity.removeExtra("DISPLAY_IMAGE_FILE_PATH");
-                //gallery_activity.putExtra("DISPLAY_IMAGE_FILE_PATH",getDir("Quicklish", MODE_PRIVATE).getAbsolutePath());
                 gallery_activity.putExtra("DISPLAY_IMAGE_FILE_PATH",prefLocalDirectory);
                 current_displayed_item++;
                 startActivityForResult(gallery_activity,0);
@@ -239,7 +341,6 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
                 movie_activity.removeExtra("DISPLAY_MOVIE_FILE");
                 movie_activity.putExtra("DISPLAY_MOVIE_FILE", displayitems.get(current_displayed_item).file);
                 movie_activity.removeExtra("DISPLAY_MOVIE_FILE_PATH");
-                //movie_activity.putExtra("DISPLAY_MOVIE_FILE_PATH",getDir("Quicklish", MODE_PRIVATE).getAbsolutePath());
                 movie_activity.putExtra("DISPLAY_MOVIE_FILE_PATH",prefLocalDirectory);
                 current_displayed_item++;
                 startActivityForResult(movie_activity,0);
@@ -248,7 +349,6 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
                 eventlist_activity.removeExtra("DISPLAY_EVENTLIST_FILE");
                 eventlist_activity.putExtra("DISPLAY_EVENTLIST_FILE", displayitems.get(current_displayed_item).file);
                 eventlist_activity.removeExtra("DISPLAY_EVENTLIST_FILE_PATH");
-                //eventlist_activity.putExtra("DISPLAY_EVENTLIST_FILE_PATH",getDir("Quicklish", MODE_PRIVATE).getAbsolutePath());
                 eventlist_activity.putExtra("DISPLAY_EVENTLIST_FILE_PATH",prefLocalDirectory);
                 current_displayed_item++;
                 startActivityForResult(eventlist_activity,0);

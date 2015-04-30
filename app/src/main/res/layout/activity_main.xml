@@ -39,6 +39,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:textStyle="bold|italic"
+        android:singleLine="true"
         android:gravity="center" />
 
     <Button

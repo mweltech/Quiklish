@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -16,27 +17,42 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".Movies"
+            android:noHistory="true"
             android:label="@string/app_name" >
         </activity>
         <activity
             android:name=".Gallery"
+            android:noHistory="true"
             android:label="@string/app_name" >
         </activity>
         <activity
             android:name=".EventList"
+            android:noHistory="true"
             android:label="@string/app_name" >
         </activity>
         <activity
             android:name=".SettingsActivity"
+            android:noHistory="true"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme">
         </activity>
+        <receiver
+            android:name=".StartMyAppAtBootReceiver"
+            android:enabled="false"
+            android:exported="true"
+            android:label="StartMyAppAtBootReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

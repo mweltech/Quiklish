@@ -16,7 +16,7 @@
             android:layout_weight="2"
             android:text="When"
             android:textColor="#c0c0c0"
-            android:textSize="18sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/whatTitle"
@@ -25,7 +25,7 @@
             android:layout_weight="1"
             android:text="What"
             android:textColor="#c0c0c0"
-            android:textSize="18sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/whereTitle"
@@ -34,7 +34,7 @@
             android:layout_weight="2"
             android:text="Where"
             android:textColor="#c0c0c0"
-            android:textSize="18sp" />
+            android:textSize="24sp" />
 
     </LinearLayout>
 
@@ -49,7 +49,7 @@
             android:layout_weight="2"
             android:text=""
             android:textColor="#ffffff"
-            android:textSize="24sp" />
+            android:textSize="32sp" />
 
         <TextView
             android:id="@+id/what1"
@@ -58,7 +58,7 @@
             android:layout_weight="1"
             android:text=""
             android:textColor="#ffffff"
-            android:textSize="24sp" />
+            android:textSize="32sp" />
 
         <TextView
             android:id="@+id/where1"
@@ -67,7 +67,7 @@
             android:layout_weight="2"
             android:text=""
             android:textColor="#ffffff"
-            android:textSize="24sp" />
+            android:textSize="32sp" />
         <!-- android:gravity="right" /> -->
     </LinearLayout>
 
@@ -82,7 +82,7 @@
             android:layout_weight="2"
             android:text=""
             android:textColor="#ffffff"
-            android:textSize="24sp" />
+            android:textSize="32sp" />
 
         <TextView
             android:id="@+id/what2"
@@ -91,7 +91,7 @@
             android:layout_weight="1"
             android:text=""
             android:textColor="#ffffff"
-            android:textSize="24sp" />
+            android:textSize="32sp" />
 
         <TextView
             android:id="@+id/where2"
@@ -100,11 +100,239 @@
             android:layout_weight="2"
             android:text=""
             android:textColor="#ffffff"
-            android:textSize="24sp" />
+            android:textSize="32sp" />
         <!-- android:gravity="right" /> -->
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
+        <TextView
+            android:id="@+id/when3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
 
+        <TextView
+            android:id="@+id/what3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/where3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+        <!-- android:gravity="right" /> -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/when4"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/what4"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/where4"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+        <!-- android:gravity="right" /> -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/when5"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/what5"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/where5"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+        <!-- android:gravity="right" /> -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/when6"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/what6"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/where6"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+        <!-- android:gravity="right" /> -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/when7"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/what7"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/where7"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+        <!-- android:gravity="right" /> -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/when8"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/what8"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/where8"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+        <!-- android:gravity="right" /> -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/when9"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/what9"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/where9"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textColor="#ffffff"
+            android:textSize="32sp" />
+        <!-- android:gravity="right" /> -->
+    </LinearLayout>
 
 </LinearLayout>

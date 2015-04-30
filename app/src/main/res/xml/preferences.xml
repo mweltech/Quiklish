@@ -8,6 +8,18 @@
             android:defaultValue=""
             android:title="Home Channel"
             android:key="Channel" />
+        <CheckBoxPreference
+            android:title="Slide Show"
+            android:summary="Run Slide Show"
+            android:key="SlideShow"
+            android:enabled="true"
+            android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:title="Startup On Boot"
+            android:summary="Start the application automatically after power on or reboot"
+            android:key="StartupOnBoot"
+            android:enabled="true"
+            android:defaultValue="false"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Server"

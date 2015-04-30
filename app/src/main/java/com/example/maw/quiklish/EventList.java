@@ -16,16 +16,24 @@ import java.util.List;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.app.Activity;
+import android.preference.PreferenceManager;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.Xml;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
 
 public class EventList extends Activity {
+
+    private GestureDetectorCompat mDetector;
 
     public class EventEntry {
         public final String when;
@@ -55,21 +63,18 @@ public class EventList extends Activity {
 
         setContentView(R.layout.eventlist);
 
+        mDetector = new GestureDetectorCompat(this, new MyGestureListener());
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             displayFile = extras.getString("DISPLAY_EVENTLIST_FILE");
             displayFilePath = extras.getString("DISPLAY_EVENTLIST_FILE_PATH");
-        }
-        else {
-            //displayFile = "EzyDisplay.jpeg";
-            //displayFilePath = getFilesDir().getPath();
         }
 
         List<EventEntry> events=null;
         int rowcount=0;
 
         try {
-            //FileInputStream fIn = openFileInput("ezydisplaydata.xml");
             File eventlistFile = new File(displayFilePath,displayFile);
             FileInputStream fIn = new FileInputStream(eventlistFile);
             events=parseEvents(fIn);
@@ -95,24 +100,31 @@ public class EventList extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        new CountDownTimer(5000, 1000) {
 
-            public void onTick(long millisUntilFinished) {
-                //mTextField.setText("seconds remaining: " + millisUntilFinished / 1000);
-            }
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        if (settings.getBoolean("SlideShow", true)) {
+            new CountDownTimer(20000, 1000) {
+                public void onTick(long millisUntilFinished) {
+                }
 
-            public void onFinish() {
-                finish();
-                //mTextField.setText("done!");
-            }
-        }.start();
-
+                public void onFinish() {
+                    finishWithNotice("TIMER_DONE");
+                }
+            }.start();
+        }
     }
 
     public void displayEvent(int row,EventEntry event) {
         switch(row) {
             case 0: setEventText(event,R.id.when1,R.id.what1,R.id.where1); break;
             case 1: setEventText(event,R.id.when2,R.id.what2,R.id.where2); break;
+            case 2: setEventText(event,R.id.when3,R.id.what3,R.id.where3); break;
+            case 3: setEventText(event,R.id.when4,R.id.what4,R.id.where4); break;
+            case 4: setEventText(event,R.id.when5,R.id.what5,R.id.where5); break;
+            case 5: setEventText(event,R.id.when6,R.id.what6,R.id.where6); break;
+            case 6: setEventText(event,R.id.when7,R.id.what7,R.id.where7); break;
+            case 7: setEventText(event,R.id.when8,R.id.what8,R.id.where8); break;
+            case 8: setEventText(event,R.id.when9,R.id.what9,R.id.where9); break;
         }
     }
 
@@ -126,35 +138,6 @@ public class EventList extends Activity {
         TextView t=new TextView(this);
         t=(TextView)findViewById(viewid);
         t.setText(text);
-    }
-
-    public void makeTestFile() {
-        FileOutputStream fOut;
-        try { // catches IOException below
-            fOut = openFileOutput("ezydisplaydata.xml",MODE_PRIVATE);
-            OutputStreamWriter osw = new OutputStreamWriter(fOut);
-
-            osw.write("<eventlist><title>Upcoming events...</title>" +
-                    "<event>" +
-                    "<when>7:00pm</when>" +
-                    "<what>Days of Our Lives</what>" +
-                    "<where>Room A</where>" +
-                    "</event>" +
-                    "<event>" +
-                    "<when>8:00pm</when>" +
-                    "<what>Dating Naked</what>" +
-                    "<where>Room B</where>" +
-                    "</event>" +
-                    "</eventlist>");
-            osw.flush();
-            osw.close();
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     public List parseEvents(InputStream in) throws XmlPullParserException, IOException {
@@ -244,5 +227,37 @@ public class EventList extends Activity {
         }
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        this.mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    public void finishWithNotice(String notice) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("FINISH_REASON", notice);
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
+    }
+
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
+            if(velocityX<0) {
+                finishWithNotice("USER_FLING_RIGHT");
+            }
+            else {
+                finishWithNotice("USER_FLING_LEFT");
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent event) {
+            finishWithNotice("USER_DOUBLETAP");
+            return true;
+        }
+    }
 
 }
