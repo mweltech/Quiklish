@@ -76,7 +76,13 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         }
         else if (preference instanceof EditTextPreference) {
             EditTextPreference editTextPreference = (EditTextPreference) preference;
-            editTextPreference.setSummary(editTextPreference.getText());
+            if(editTextPreference.getKey().equals("Password")) {
+                editTextPreference.setSummary("*********");
+            }
+            else
+            {
+                editTextPreference.setSummary(editTextPreference.getText());
+            }
         }
     }
 }

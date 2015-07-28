@@ -1,25 +1,65 @@
 package com.example.maw.quiklish;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
+import android.util.AttributeSet;
 import android.view.GestureDetector;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 import java.io.File;
 
 /**
- * Created by maw on 29/12/2014.
+ * Created by maw on 14/07/2015.
  */
-public class Movies extends Activity {
-    VideoView myVideoView;
+public class MoviesXStretch extends Activity {
+
+    public class MyVideoView extends VideoView {
+
+        private int mVideoWidth;
+        private int mVideoHeight;
+
+        public MyVideoView(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        public MyVideoView(Context context, AttributeSet attrs, int defStyle) {
+            super(context, attrs, defStyle);
+        }
+
+        public MyVideoView(Context context) {
+            super(context);
+        }
+
+        public void setVideoSize(int width, int height) {
+            mVideoWidth = width;
+            mVideoHeight = height;
+        }
+
+        @Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
+            int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
+            if (mVideoWidth > 0 && mVideoHeight > 0) {
+                if (mVideoWidth * height > width * mVideoHeight) {
+                    height = width * mVideoHeight / mVideoWidth;
+                } else if (mVideoWidth * height < width * mVideoHeight) {
+                    width = height * mVideoWidth / mVideoHeight;
+                }
+            }
+
+            setMeasuredDimension(10*width/12, 10*height/12);
+        }
+    }
+
+    //MyVideoView myVideoView;
     String displayFilePath;
     String displayFile;
     private GestureDetectorCompat mDetector;
@@ -32,7 +72,7 @@ public class Movies extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         // stop device going to sleep
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.movies);
+        setContentView(R.layout.moviexstretch);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             displayFile = extras.getString("DISPLAY_MOVIE_FILE");
@@ -44,9 +84,12 @@ public class Movies extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        setContentView(R.layout.movies);
+//        setContentView(R.layout.moviexstretch);
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.videoXStretch1);
+        MyVideoView myVideoView = new MyVideoView(this);
+        layout.addView(myVideoView);
         File movieFile = new File(displayFilePath,displayFile);
-        myVideoView = (VideoView)findViewById(R.id.videoView1);
+        //myVideoView = (VideoView)findViewById(R.id.videoView1);
         String sPathToMovie = movieFile.getAbsolutePath();
         myVideoView.setVideoPath(sPathToMovie);
         myVideoView.requestFocus();

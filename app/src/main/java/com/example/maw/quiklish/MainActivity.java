@@ -55,6 +55,8 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
     private Intent movie_activity;
     private Intent gallery_activity;
     private Intent eventlist_activity;
+    private Intent gallery_banner_activity;
+    private Intent multi_gallery_banner_activity;
     private int current_state;
     private List<DisplayItem> displayitems;
     private Integer current_displayed_item;
@@ -93,8 +95,11 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
             current_displayed_item = 0;
         }
         movie_activity = new Intent(this, Movies.class);
+        //movie_activity = new Intent(this, MoviesXStretch.class);
         gallery_activity = new Intent(this, Gallery.class);
         eventlist_activity = new Intent(this, EventList.class);
+        gallery_banner_activity = new Intent(this, GalleryBanner.class);
+        multi_gallery_banner_activity = new Intent(this, MultiGalleryBanner.class);
 
         //select last/default channel
         String prefChannel = getPreferencesString("Channel");
@@ -188,9 +193,13 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
         ftp.setStatusDisplay(t);
         ftp.setDownloadListener(this);
         String prefServer = getPreferencesString("Server");
-        String prefRemoteDirectory = getRemoteDirectory();
-        String prefLocalDirectory = getLocalDirectory();
-        ftp.execute(new String[]{prefServer,prefRemoteDirectory,prefLocalDirectory});
+        String prefRemoteDirectory = getDirectory("RemoteDirectory");
+        String prefLocalDirectory = getDirectory("LocalDirectory");
+        String prefUsername = getPreferencesString("Username");
+        String prefPassword = getPreferencesString("Password");
+        //String prefGallery = getGallery();
+        String prefGallery = getDirectory("Gallery");
+        ftp.execute(new String[]{prefServer,prefRemoteDirectory,prefLocalDirectory,prefUsername,prefPassword,prefGallery});
     }
 
     private String getPreferencesString(String prefName) {
@@ -235,7 +244,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
             if (resultCode == RESULT_OK) {
                 String reason = data.getStringExtra("FINISH_REASON");
                 // only move to next item if the timer finishes normally...
-                if(reason.equals("TIMER_DONE") || reason.equals("USER_FLING_LEFT") || reason.equals("USER_FLING_RIGHT")) {
+                if(reason.equals("TIMER_DONE") || reason.equals("GALLERY_DONE") || reason.equals("MOVIE_DONE") || reason.equals("USER_FLING_LEFT") || reason.equals("USER_FLING_RIGHT")) {
                     finishActivity(0);
                     if(reason.equals("USER_FLING_LEFT")) {
                         runTheShow(GO_PREVIOUS);
@@ -281,15 +290,8 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
         return super.onOptionsItemSelected(item);
     }
 
-    private String getLocalDirectory() {
-        String prefDirectory = getPreferencesString("LocalDirectory");
-        prefDirectory=fixDirectoryPath(prefDirectory);
-        prefDirectory=fixDirectoryPath(prefDirectory+getPreferencesString("Channel"));
-        return prefDirectory;
-    }
-
-    private String getRemoteDirectory() {
-        String prefDirectory = getPreferencesString("RemoteDirectory");
+    private String getDirectory(String prefName) {
+        String prefDirectory = getPreferencesString(prefName);
         prefDirectory=fixDirectoryPath(prefDirectory);
         prefDirectory=fixDirectoryPath(prefDirectory+getPreferencesString("Channel"));
         return prefDirectory;
@@ -297,7 +299,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
 
     private void readDisplayItems() {
         try {
-            String prefLocalDirectory = getLocalDirectory();
+            String prefLocalDirectory = getDirectory("LocalDirectory");
             FileInputStream config_file = new FileInputStream(prefLocalDirectory+"ezydisplaydata.xml");
             DisplayListReader display_list_reader = new DisplayListReader();
             display_list_reader.readListFromFile(config_file);
@@ -314,7 +316,8 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
     }
 
     private void runTheShow(int direction) {
-        String prefLocalDirectory = getLocalDirectory();
+        String prefLocalDirectory = getDirectory("LocalDirectory");
+        String prefGallery = getDirectory("Gallery");
         readDisplayItems();
         if(displayitems!=null) {
             if(direction==GO_NEXT) {
@@ -352,6 +355,26 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
                 eventlist_activity.putExtra("DISPLAY_EVENTLIST_FILE_PATH",prefLocalDirectory);
                 current_displayed_item++;
                 startActivityForResult(eventlist_activity,0);
+            }
+            else if(displayitems.get(current_displayed_item).item_type.equals("gallery_banner")) {
+                gallery_banner_activity.removeExtra("DISPLAY_BANNER_FILE");
+                gallery_banner_activity.putExtra("DISPLAY_BANNER_FILE", displayitems.get(current_displayed_item).file);
+                gallery_banner_activity.removeExtra("DISPLAY_BANNER_FILE_PATH");
+                gallery_banner_activity.putExtra("DISPLAY_BANNER_FILE_PATH",prefLocalDirectory);
+                gallery_banner_activity.removeExtra("DISPLAY_GALLERY_FILE_PATH");
+                gallery_banner_activity.putExtra("DISPLAY_GALLERY_FILE_PATH",prefGallery);
+                current_displayed_item++;
+                startActivityForResult(gallery_banner_activity,0);
+            }
+            else if(displayitems.get(current_displayed_item).item_type.equals("multi_gallery_banner")) {
+                multi_gallery_banner_activity.removeExtra("DISPLAY_BANNER_FILE");
+                multi_gallery_banner_activity.putExtra("DISPLAY_BANNER_FILE", displayitems.get(current_displayed_item).file);
+                multi_gallery_banner_activity.removeExtra("DISPLAY_BANNER_FILE_PATH");
+                multi_gallery_banner_activity.putExtra("DISPLAY_BANNER_FILE_PATH",prefLocalDirectory);
+                multi_gallery_banner_activity.removeExtra("DISPLAY_GALLERY_FILE_PATH");
+                multi_gallery_banner_activity.putExtra("DISPLAY_GALLERY_FILE_PATH",prefGallery);
+                current_displayed_item++;
+                startActivityForResult(multi_gallery_banner_activity,0);
             }
         }
     }

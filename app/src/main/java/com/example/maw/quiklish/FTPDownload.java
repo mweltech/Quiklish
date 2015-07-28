@@ -7,7 +7,9 @@ import it.sauronsoftware.ftp4j.FTPAbortedException;
 import it.sauronsoftware.ftp4j.FTPClient;
 import it.sauronsoftware.ftp4j.FTPDataTransferException;
 import it.sauronsoftware.ftp4j.FTPException;
+import it.sauronsoftware.ftp4j.FTPFile;
 import it.sauronsoftware.ftp4j.FTPIllegalReplyException;
+import it.sauronsoftware.ftp4j.FTPListParseException;
 
 import java.io.*;
 import java.util.List;
@@ -35,9 +37,12 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
         String host       = url[0];
         String remoteDir  = url[1];
         String localDir   = url[2];
-
+        String username   = url[3];
+        String password   = url[4];
+        String galleryDir = url[5];
         Integer i=0;
-        getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,"ezydisplaydata.xml",localDir);   publishProgress(++i);
+        //getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,"ezydisplaydata.xml",localDir);   publishProgress(++i);
+        getFile(host,21,username,password,remoteDir,"ezydisplaydata.xml",localDir);   publishProgress(++i);
         List<DisplayItem> displayitems;
         File xmlFile = new File(localDir,"ezydisplaydata.xml");
         try {
@@ -47,9 +52,11 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
             displayitems = display_list_reader.getList();
             config_file.close();
             for(DisplayItem displayitem : displayitems) {
-                getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,displayitem.file,localDir);
+                //getFile(host,21,"ezyd9850","Ax3!YC9b",remoteDir,displayitem.file,localDir);
+                getFile(host,21,username,password,remoteDir,displayitem.file,localDir);
                 publishProgress(++i);
             }
+            getGalleryFiles(host,21,username,password,remoteDir+"Gallery",galleryDir);
         }
         catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
@@ -60,6 +67,51 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
         }
         response="Done";
         return response;
+    }
+
+    boolean getGalleryFiles(String host, int port, String user, String pass, String remoteDir,String localDir) {
+        boolean success=false;
+        FTPClient client = new FTPClient();
+        try {
+            String serverHostMessage[] = client.connect(host, port);
+            client.login(user, pass);
+            client.changeDirectory(remoteDir);
+            client.setType(FTPClient.TYPE_BINARY);
+            client.setPassive(true);
+            File localDirectory = new File(localDir);
+            localDirectory.mkdirs();
+            localDirectory.setReadable(true, false);
+            FTPFile[] list = client.list();
+            client.disconnect(true);
+            success=true;
+            for (int i=0;i<list.length;i++) {
+                getFile(host,port,user,pass,remoteDir,list[i].getName(),localDir);
+                publishProgress(i+1);
+            }
+        } catch (FTPListParseException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (FTPIllegalReplyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (FTPException e) {
+            // TODO Auto-generated catch block
+            e.getCode();
+            e.getMessage();
+            e.printStackTrace();
+        } catch (FTPDataTransferException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (FTPAbortedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return success;
     }
 
     boolean getFile(String host, int port, String user, String pass, String remoteDir,String remoteFile,String localDir) {
@@ -80,9 +132,9 @@ public class FTPDownload extends AsyncTask<String, Integer, String>{
 
             File successFile = new File(localDirectory,remoteFile);
             successFile.delete();
-            localFile.renameTo(successFile);
+            success = localFile.renameTo(successFile);
             successFile.setReadable(true,false);
-            success = successFile.setWritable(true,false);
+            successFile.setWritable(true,false);
         } catch (IllegalStateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

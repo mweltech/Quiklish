@@ -1,39 +1,49 @@
 package com.example.maw.quiklish;
 
 /**
- * Created by maw on 9/01/2015.
+ * Created by maw on 8/06/2015.
  */
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Point;
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.app.Activity;
+import android.os.Environment;
+import android.preference.PreferenceManager;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.MotionEventCompat;
+import android.util.Log;
+import android.util.Xml;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.app.Activity;
-import android.preference.PreferenceManager;
-import android.support.v4.view.GestureDetectorCompat;
-import android.util.Xml;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.TextView;
-
-
-public class EventList extends Activity {
-
-    private GestureDetectorCompat mDetector;
+public class GalleryBanner extends Activity implements Animation.AnimationListener {
 
     public class EventEntry {
         public final String when;
@@ -47,11 +57,17 @@ public class EventList extends Activity {
         }
     }
 
+    private ImageView imageView;
+    private GestureDetectorCompat mDetector;
+    private int imagecount=0;
+    private int eventcount=0;
+    private List<EventEntry> eventList;
+    private File[] galleryFiles;
+    private List<Bitmap> galleryImages;
+    private boolean updatePicture = true;
+
     // We don't use namespaces
     private static final String ns = null;
-
-    String displayFilePath;
-    String displayFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,31 +79,137 @@ public class EventList extends Activity {
         // stop device going to sleep
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        setContentView(R.layout.gallery_banner);
 
-        setContentView(R.layout.eventlist);
-
+        imageView=(ImageView)findViewById(R.id.galleryImg1);
         mDetector = new GestureDetectorCompat(this, new MyGestureListener());
+
+        File imgFile;
+
+        String imageFilePath;
+        String imageFile;
+        String bannerFilePath;
+        String bannerFile;
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            displayFile = extras.getString("DISPLAY_EVENTLIST_FILE");
-            displayFilePath = extras.getString("DISPLAY_EVENTLIST_FILE_PATH");
+            //displayFile = extras.getString("DISPLAY_IMAGE_FILE");
+            imageFile = "EzyDisplay.jpeg";
+            imageFilePath = extras.getString("DISPLAY_GALLERY_FILE_PATH");
+            openGallery(imageFilePath);
+            bannerFile = extras.getString("DISPLAY_BANNER_FILE");
+            bannerFilePath = extras.getString("DISPLAY_BANNER_FILE_PATH");
+            eventList=openEventsFile(bannerFilePath,bannerFile);
+        }
+        else {
+            imageFile = "EzyDisplay.jpeg";
+            imageFilePath = getFilesDir().getPath();
         }
 
-        List<EventEntry> events=null;
-        int rowcount=0;
+        imgFile = new File(imageFilePath,imageFile);
 
-        try {
-            File eventlistFile = new File(displayFilePath,displayFile);
-            FileInputStream fIn = new FileInputStream(eventlistFile);
-            events=parseEvents(fIn);
-            fIn.close();
-            for(EventEntry event  : events) {
-                displayEvent(rowcount,event);
-                rowcount++;
+        if(imgFile.exists())
+        {
+            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            imageView.setImageBitmap(myBitmap);
+        }
+        // set banner scrolling
+
+        TextView tv = (TextView) this.findViewById(R.id.bannerWhat);
+        tv.setSelected(true);  // Set focus to the textview
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        updateGallery();
+        updateBanner();
+
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+    }
+
+
+    public void onAnimationEnd(Animation animation) {
+        updateGallery();
+        updateBanner();
+    }
+    public void onAnimationRepeat(Animation animation) {
+        // TODO Auto-generated method stub
+    }
+    public void onAnimationStart(Animation animation) {
+        // TODO Auto-generated method stub
+    }
+
+    public void openGallery(String galleryPath) {
+        File f = new File(galleryPath);
+        if(f.exists()) {
+            galleryFiles = f.listFiles();
+            galleryImages = new ArrayList();
+            for (int i=0;i<galleryFiles.length;i++) {
+                Bitmap bmp = BitmapFactory.decodeFile(galleryFiles[i].getAbsolutePath());
+                galleryImages.add(bmp);
             }
         }
-        catch (FileNotFoundException e) {
+    }
+
+    public void updateGallery() {
+        imageView=(ImageView)findViewById(R.id.galleryImg1);
+        if(imagecount>=galleryImages.size() || imagecount<0) {
+            imagecount = 0;
+        }
+        int fadeInDuration = 2000; // Configure time values here
+        int timeBetween = 11000;
+        int fadeOutDuration = 2000;
+
+        imageView.setVisibility(View.INVISIBLE);    //Visible or invisible by default - this will apply when the animation ends
+        imageView.setImageBitmap(galleryImages.get(imagecount));
+
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator()); // add this
+        fadeIn.setDuration(fadeInDuration);
+
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateInterpolator()); // and this
+        fadeOut.setStartOffset(fadeInDuration + timeBetween);
+        fadeOut.setDuration(fadeOutDuration);
+        AnimationSet animation = new AnimationSet(false); // change to false
+        animation.addAnimation(fadeIn);
+        animation.addAnimation(fadeOut);
+        animation.setRepeatCount(1);
+        imageView.setAnimation(animation);
+        animation.setAnimationListener(this);
+        imagecount++;
+    }
+
+    public void updateBanner() {
+        if(eventcount>=eventList.size() || eventcount<0) {
+            eventcount = 0;
+        }
+        EventEntry ee=eventList.get(eventcount);
+        TextView textView = (TextView) findViewById(R.id.bannerWhat);
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        int screenWidth = size.x;
+        textView.setText(ee.when+"       "+ee.what+"       "+ee.where);
+        textView.measure(0, 0);
+        int textWidth = textView.getMeasuredWidth();
+        Animation mAnimation = new TranslateAnimation(screenWidth, -textWidth, 0, 0);
+        mAnimation.setDuration(15000);    // Set custom duration.
+        mAnimation.setStartOffset(500);     // Set custom offset.
+        textView.startAnimation(mAnimation);
+        eventcount++;
+    }
+
+    public List<EventEntry> openEventsFile(String filePath,String fileName) {
+        List<EventEntry> events = null;
+
+        try {
+            File eventlistFile = new File(filePath, fileName);
+            FileInputStream fIn = new FileInputStream(eventlistFile);
+            events = parseEvents(fIn);
+            fIn.close();
+        } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
@@ -97,50 +219,7 @@ public class EventList extends Activity {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        if (settings.getBoolean("SlideShow", true)) {
-            new CountDownTimer(20000, 1000) {
-                public void onTick(long millisUntilFinished) {
-                }
-
-                public void onFinish() {
-                    finishWithNotice("TIMER_DONE");
-                }
-            }.start();
-        }
-    }
-
-    public void displayEvent(int row,EventEntry event) {
-        switch(row) {
-            case 0: setEventText(event,R.id.when1,R.id.what1,R.id.where1); break;
-            case 1: setEventText(event,R.id.when2,R.id.what2,R.id.where2); break;
-            case 2: setEventText(event,R.id.when3,R.id.what3,R.id.where3); break;
-            case 3: setEventText(event,R.id.when4,R.id.what4,R.id.where4); break;
-            case 4: setEventText(event,R.id.when5,R.id.what5,R.id.where5); break;
-            case 5: setEventText(event,R.id.when6,R.id.what6,R.id.where6); break;
-            case 6: setEventText(event,R.id.when7,R.id.what7,R.id.where7); break;
-            case 7: setEventText(event,R.id.when8,R.id.what8,R.id.where8); break;
-            case 8: setEventText(event,R.id.when9,R.id.what9,R.id.where9); break;
-        }
-    }
-
-    public void setEventText(EventEntry event, int when,int what,int where) {
-        setText(event.when,when);
-        setText(event.what,what);
-        setText(event.where,where);
-    }
-
-    public void setText(String text,int viewid) {
-        TextView t=new TextView(this);
-        t=(TextView)findViewById(viewid);
-        t.setText(text);
+        return events;
     }
 
     public List parseEvents(InputStream in) throws XmlPullParserException, IOException {
@@ -262,5 +341,4 @@ public class EventList extends Activity {
             return true;
         }
     }
-
 }
