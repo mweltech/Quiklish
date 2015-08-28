@@ -55,6 +55,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
     private Intent movie_activity;
     private Intent gallery_activity;
     private Intent eventlist_activity;
+    private Intent weekly_activity;
     private Intent gallery_banner_activity;
     private Intent multi_gallery_banner_activity;
     private int current_state;
@@ -98,6 +99,7 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
         //movie_activity = new Intent(this, MoviesXStretch.class);
         gallery_activity = new Intent(this, Gallery.class);
         eventlist_activity = new Intent(this, EventList.class);
+        weekly_activity = new Intent(this, Weekly.class);
         gallery_banner_activity = new Intent(this, GalleryBanner.class);
         multi_gallery_banner_activity = new Intent(this, MultiGalleryBanner.class);
 
@@ -130,17 +132,19 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
             }
         });
 
-        new CountDownTimer(5000, 1000) {
-            public void onTick(long millisUntilFinished) {
-                if(cancel_startup_timer==true) {
-                    cancel();
+        if(prefChannel.length()>0) {
+            new CountDownTimer(5000, 1000) {
+                public void onTick(long millisUntilFinished) {
+                    if (cancel_startup_timer == true) {
+                        cancel();
+                    }
                 }
-            }
 
-            public void onFinish() {
-                tuneInChannel();
-            }
-        }.start();
+                public void onFinish() {
+                    tuneInChannel();
+                }
+            }.start();
+        }
     }
 
     public void tuneInChannel() {
@@ -355,6 +359,14 @@ public class MainActivity extends ActionBarActivity implements DownloadListener 
                 eventlist_activity.putExtra("DISPLAY_EVENTLIST_FILE_PATH",prefLocalDirectory);
                 current_displayed_item++;
                 startActivityForResult(eventlist_activity,0);
+            }
+            else if(displayitems.get(current_displayed_item).item_type.equals("weekly")) {
+                weekly_activity.removeExtra("DISPLAY_WEEKLY_FILE");
+                weekly_activity.putExtra("DISPLAY_WEEKLY_FILE", displayitems.get(current_displayed_item).file);
+                weekly_activity.removeExtra("DISPLAY_WEEKLY_FILE_PATH");
+                weekly_activity.putExtra("DISPLAY_WEEKLY_FILE_PATH",prefLocalDirectory);
+                current_displayed_item++;
+                startActivityForResult(weekly_activity,0);
             }
             else if(displayitems.get(current_displayed_item).item_type.equals("gallery_banner")) {
                 gallery_banner_activity.removeExtra("DISPLAY_BANNER_FILE");

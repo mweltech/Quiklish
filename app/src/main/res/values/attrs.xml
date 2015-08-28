@@ -1,0 +1,9 @@
+<resources>
+    <declare-styleable name="SizeableVideo">
+        <attr name="vidShowText" format="boolean" />
+        <attr name="vidLabelPosition" format="enum">
+            <enum name="left" value="0"/>
+            <enum name="right" value="1"/>
+        </attr>
+    </declare-styleable>
+</resources>

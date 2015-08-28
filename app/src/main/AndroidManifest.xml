@@ -41,12 +41,22 @@
             android:label="@string/app_name" >
         </activity>
         <activity
+            android:name=".Weekly"
+            android:noHistory="true"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
             android:name=".GalleryBanner"
             android:noHistory="true"
             android:label="@string/app_name" >
         </activity>
         <activity
             android:name=".MultiGalleryBanner"
+            android:noHistory="true"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".SizeableVideo"
             android:noHistory="true"
             android:label="@string/app_name" >
         </activity>

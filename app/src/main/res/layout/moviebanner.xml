@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical|center_horizontal"
+    android:background="#ff000000">
+
+        <com.example.maw.quiklish.SizeableVideo
+            android:id="@+id/sVideoView1"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            custom:vidShowText="true"
+            custom:vidLabelPosition="left"
+            />
+
+    <TextView
+        android:id="@+id/what9"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Some Text"
+        android:textColor="#ffffff"
+        android:textSize="18sp" />
+
+
+</LinearLayout>

@@ -2,6 +2,7 @@ package com.example.maw.quiklish;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Point;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
@@ -19,7 +20,7 @@ import java.io.File;
  * Created by maw on 29/12/2014.
  */
 public class Movies extends Activity {
-    VideoView myVideoView;
+    SizeableVideo myVideoView;
     String displayFilePath;
     String displayFile;
     private GestureDetectorCompat mDetector;
@@ -32,7 +33,8 @@ public class Movies extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         // stop device going to sleep
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.movies);
+        //setContentView(R.layout.movies);
+        setContentView(R.layout.moviebanner);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             displayFile = extras.getString("DISPLAY_MOVIE_FILE");
@@ -44,12 +46,19 @@ public class Movies extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        setContentView(R.layout.movies);
+        setContentView(R.layout.moviebanner);
         File movieFile = new File(displayFilePath,displayFile);
-        myVideoView = (VideoView)findViewById(R.id.videoView1);
+        myVideoView = (SizeableVideo)findViewById(R.id.sVideoView1);
         String sPathToMovie = movieFile.getAbsolutePath();
         myVideoView.setVideoPath(sPathToMovie);
         myVideoView.requestFocus();
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        int columnWidth = (size.x-7*4)/7;  //padding is 2 so need 4 per cell
+        int videoWidth=size.x-columnWidth;
+        int videoHeight=size.y;
+        myVideoView.setDimensions(videoWidth,videoHeight);
+        myVideoView.getHolder().setFixedSize(videoWidth,videoHeight);
         myVideoView.start();
 
         myVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
